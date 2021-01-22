@@ -5,7 +5,7 @@ var store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
-}
+} 
 
 // We need our javascript to wait until the DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
@@ -117,6 +117,22 @@ function runRace(raceID) {
 	  }, 500);
 	}) 
 };
+	/* 
+		TODO - if the race info status property is "in-progress", update the leaderboard by calling:
+
+		renderAt('#leaderBoard', raceProgress(res.positions))
+	*/
+
+	/* 
+		TODO - if the race info status property is "finished", run the following:
+
+		clearInterval(raceInterval) // to stop the interval from repeating
+		renderAt('#race', resultsView(res.positions)) // to render the results view
+		reslove(res) // resolve the promise
+	*/
+	
+	// remember to add error handling for the Promise
+
 
 async function runCountdown() {
 	try {
@@ -153,8 +169,9 @@ function handleSelectPodRacer(target) {
 
 	// add class selected to current target
 	target.classList.add('selected')
-
+    console.log(selected);
 	// TODO - save the selected racer to the store
+	store.track_id = parseInt(target.id);
 }
 
 function handleSelectTrack(target) {
@@ -168,9 +185,9 @@ function handleSelectTrack(target) {
 
 	// add class selected to current target
 	target.classList.add('selected')
-
+    console.log(selected);
 	// TODO - save the selected track id to the store
-	
+	store.track_id = parseInt(target.id);
 }
 
 function handleAccelerate() {
@@ -192,7 +209,7 @@ function renderRacerCars(racers) {
 
 	return `
 		<ul id="racers">
-			${reuslts}
+			${results}
 		</ul>
 	`
 }
@@ -328,6 +345,7 @@ function defaultFetchOpts() {
 }
 
 // TODO - Make a fetch call (with error handling!) to each of the following API endpoints 
+
 function getTracks() {
 	// GET request to `${SERVER}/api/tracks`
 	return fetch(`${SERVER}/api/tracks`)
