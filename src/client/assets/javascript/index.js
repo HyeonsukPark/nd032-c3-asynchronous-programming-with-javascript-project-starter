@@ -1,7 +1,8 @@
-// PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
+
+	// PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
 
 // The store will hold all information needed globally
-var store = {
+let store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
@@ -86,19 +87,15 @@ async function handleCreateRace() {
 		// const race = TODO - invoke the API call to create the race, then save the result
 		const race = await createRace(player_id, track_id);
 		console.log(race);
+	
+
 		// render starting UI
         renderAt('#race', renderRaceStartView(race.Track, race.Cars))
-        console.log("race", race);
+		console.log("race", race);
+		
 		// TODO - update the store with the race id
-		const data = {
-			track_id: race.Track.id,
-			player_id: race.PlayerID,
-			race_id: race.ID,
-		};
-		Object.assign(store, data);
-		console.log("store", store);
+		store.race_id = race.ID-1;
 
-        store.race_id = race.ID-1;
 	// The race has been created, now start the countdown
 	// TODO - call the async function runCountdown
        await runCountdown()
@@ -117,26 +114,24 @@ function runRace(raceID) {
 	// TODO - use Javascript's built in setInterval method to get race info every 500ms
 	  const racerInterval = setInterval(async () => {
 		getRace(raceID)
-		.then((data) => {
-		 	 console.log("data", data);
+		.then((res) => {
+		 	 //console.log("data", data);
         /* 
 		TODO - if the race info status property is "in-progress", update the leaderboard by calling:
-
 		renderAt('#leaderBoard', raceProgress(res.positions))
 	*/
-			if(data.status === "in-progress") {
-				renderAt('#leaderBoard', raceProgress(data.positions))
+			if(res.status === "in-progress") {
+				renderAt('#leaderBoard', raceProgress(res.positions))
 				/* 
 		TODO - if the race info status property is "finished", run the following:
-
 		clearInterval(raceInterval) // to stop the interval from repeating
 		renderAt('#race', resultsView(res.positions)) // to render the results view
 		reslove(res) // resolve the promise
 	*/
-			} else if (data.status === "finished") {
+			} else if (res.status === "finished") {
 				clearInterval(racerInterval)
-				renderAt('#race', resultsView(data.positions))
-				resolve(data)
+				renderAt('#race', resultsView(res.positions))
+				resolve(res)
 			}
 		}).catch(err => console.log(err))
 
@@ -210,7 +205,7 @@ function handleSelectTrack(target) {
  function handleAccelerate() {
 	console.log("accelerate button clicked")
 	// TODO - Invoke the API call to accelerate
-	accelerate(store.race_id - 1);
+	accelerate(store.race_id);
 }
 
 // HTML VIEWS ------------------------------------------------
@@ -306,7 +301,6 @@ function renderRaceStartView(track, racers) {
 			<section id="leaderBoard">
 				${renderCountdown(3)}
 			</section>
-
 			<section id="accelerate">
 				<h2>Directions</h2>
 				<p>Click the button as fast as you can to make your racer go faster!</p>
@@ -419,7 +413,7 @@ function getRace(id) {
 	return fetch(`${SERVER}/api/races/${id}`)
 		   .then(res => res.json())
 		   .catch(error => console.log("Problem with getRacers request::", error));
-}
+} 
 
 function startRace(id) {
 	return fetch(`${SERVER}/api/races/${id}/start`, {
@@ -435,10 +429,5 @@ function accelerate(id) {
 	// no body or datatype needed for this request
 	return fetch(`${SERVER}/api/races/${id}/accelerate`, {
 		method: 'POST',
-		...defaultFetchOpts(),
-	})
-	.catch(err => console.log(err))
+	}).catch(err => console.log("Problem with accelerate::", err))
 }
-
-
-
